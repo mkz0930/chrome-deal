@@ -1,7 +1,53 @@
 ---
 name: chrome-deal
 description: "通过 WebSocket Relay Server 控制 Windows Chrome 浏览器。支持打开网页、点击、输入、滚动、截图、登录、Cookie 管理、标签页管理等完整操作。基于自研 chrome-control-amz 插件。"
+triggers:
+  - "打开浏览器"
+  - "打开网页"
+  - "打开网站"
+  - "打开链接"
+  - "打开URL"
+  - "登录"
+  - "点击"
+  - "滚轮"
+  - "滚动"
+  - "截图"
+  - "截屏"
+  - "浏览器"
+  - "Chrome"
+  - "chrome"
+  - "网页操作"
+  - "输入"
+  - "搜索框"
+  - "标签页"
+  - "Cookie"
+  - "下载文件"
+  - "open browser"
+  - "open url"
+  - "navigate"
+  - "click"
+  - "scroll"
+  - "screenshot"
+  - "login"
+defaults:
+  port: 19000
+  ws_uri: "ws://127.0.0.1:19000"
 ---
+
+## 触发条件
+
+当用户提到以下任意关键词时，自动调用此 skill：
+
+| 类别 | 关键词 |
+|------|--------|
+| 导航 | 打开浏览器、打开网页、打开网站、打开链接、打开URL、navigate |
+| 交互 | 点击、click、输入、搜索框、滚轮、滚动、scroll |
+| 登录 | 登录、login |
+| 截图 | 截图、截屏、screenshot |
+| 标签 | 标签页、新建标签、切换标签 |
+| 其他 | Chrome、浏览器、Cookie、下载文件 |
+
+默认端口：`19000`，无需额外指定。
 
 ## 架构
 
