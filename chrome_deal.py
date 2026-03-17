@@ -7,17 +7,56 @@ import json
 import time
 import base64
 import random
+import os
+import subprocess
+import socket
 import websockets
 
 WS_URI = "ws://127.0.0.1:19000"
+SERVER_PORT = 19000
+SERVER_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "server")
+
+
+def _is_port_open(port=SERVER_PORT, host="127.0.0.1"):
+    """检查端口是否在监听"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(1)
+        return s.connect_ex((host, port)) == 0
+
+
+def ensure_server(port=SERVER_PORT):
+    """确保 relay server 在运行，没运行就自动启动"""
+    if _is_port_open(port):
+        return True
+    server_py = os.path.join(SERVER_DIR, "server.py")
+    if not os.path.exists(server_py):
+        raise FileNotFoundError(f"server.py not found: {server_py}")
+    log_path = os.path.join(SERVER_DIR, "server.log")
+    env = os.environ.copy()
+    env["SERVER_PORT"] = str(port)
+    subprocess.Popen(
+        ["python3", server_py],
+        cwd=SERVER_DIR, env=env,
+        stdout=open(log_path, "a"),
+        stderr=subprocess.STDOUT,
+        start_new_session=True
+    )
+    # 等待启动
+    for _ in range(20):
+        time.sleep(0.25)
+        if _is_port_open(port):
+            return True
+    return False
 
 
 class ChromeDeal:
     """Chrome 浏览器操作封装"""
 
-    def __init__(self, ws_uri=WS_URI):
+    def __init__(self, ws_uri=WS_URI, auto_server=True):
         self.ws_uri = ws_uri
         self.tab_id = None
+        if auto_server:
+            ensure_server()
 
     async def cmd(self, action, timeout=None, **kwargs):
         """发送命令到 Chrome 插件"""
